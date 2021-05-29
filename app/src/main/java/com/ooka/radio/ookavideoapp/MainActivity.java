@@ -9,6 +9,7 @@ public class MainActivity extends AppCompatActivity {
     public static ViewPager2 view_pager2;
     private HomeFragmentNew homeFragmentNew;
     public static int fragmentPosition = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -54,6 +54,7 @@ public class ViewPagerHomeFragment extends Fragment {
                 modelduration = simpleExoPlayer.getDuration();
                   duration =toMMSS(modelduration);
                 progressBar.setVisibility(View.GONE);
+
                 Toast.makeText(context, "duration : " + duration, Toast.LENGTH_SHORT).show();
             }
 
@@ -64,6 +65,32 @@ public class ViewPagerHomeFragment extends Fragment {
 
         }
     };
+
+    private final Runnable updateUI= new Runnable()
+    {
+        public void run()
+        {
+            try
+            {
+                //update ur ui here
+               // start.setText((simpleExoPlayer.getCurrentPosition()/simpleExoPlayer.getDuration())*100);
+               // ‌​ end.setText(mPlayer.getDuration()-mPlayer.getCurrentPosition())
+                if ((simpleExoPlayer.getDuration() - simpleExoPlayer.getCurrentPosition()) == timeLeft){
+                    //Toast.makeText(context, "Show recyclerview", Toast.LENGTH_SHORT).show();
+                    Log.d("amit","Show recyclerview");
+                }
+
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    };
+    private final Handler mHandler = new Handler();
+
+
+
 
     public static Fragment newInstance(String homeVideoModelList, Context context, int position,
                                        ViewPager2 view_pager_stories) {
@@ -116,6 +143,7 @@ public class ViewPagerHomeFragment extends Fragment {
                 simpleExoPlayer.seekTo(seekPosition);
                 if (mediaSource != null)
                     simpleExoPlayer.prepare(mediaSource, false, false);
+                mHandler.post(updateUI);
             }
         } catch (Exception e) {
             e.printStackTrace();
