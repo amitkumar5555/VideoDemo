@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">OokaVideoApp</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_tag_line_radio" formatted="true">
+        <font color="#000000">Radi</font><font color="#FFC8050D">o</font>
+    </string>
+</resources>
