@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,7 +43,8 @@ public class ViewPagerHomeFragment extends Fragment {
     private boolean b = true;
     private String duration;
     private ProgressBar progressBar;
-    int timeLeft = 5000;
+    private final int FIVE_SECONDS = 1000;
+
 
     SimpleExoPlayer.EventListener eventListener = new Player.EventListener() {
         @Override
@@ -55,42 +55,22 @@ public class ViewPagerHomeFragment extends Fragment {
                   duration =toMMSS(modelduration);
                 progressBar.setVisibility(View.GONE);
 
+                if (b){
+                    b = false;
+                     Log.d("amit","thread line up");
+                      scheduleSendPosition();
+                     Log.d("amit","thread line down");
+                }
                 Toast.makeText(context, "duration : " + duration, Toast.LENGTH_SHORT).show();
             }
-
             if (playbackState == Player.STATE_ENDED && playWhenReady) {
                 Log.v("amit","ended");
+                b = true;
                 view_pager_stories.setCurrentItem(view_pager_stories.getCurrentItem()+1);
             }
 
         }
     };
-
-    private final Runnable updateUI= new Runnable()
-    {
-        public void run()
-        {
-            try
-            {
-                //update ur ui here
-               // start.setText((simpleExoPlayer.getCurrentPosition()/simpleExoPlayer.getDuration())*100);
-               // ‌​ end.setText(mPlayer.getDuration()-mPlayer.getCurrentPosition())
-                if ((simpleExoPlayer.getDuration() - simpleExoPlayer.getCurrentPosition()) == timeLeft){
-                    //Toast.makeText(context, "Show recyclerview", Toast.LENGTH_SHORT).show();
-                    Log.d("amit","Show recyclerview");
-                }
-
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-    };
-    private final Handler mHandler = new Handler();
-
-
-
 
     public static Fragment newInstance(String homeVideoModelList, Context context, int position,
                                        ViewPager2 view_pager_stories) {
@@ -120,13 +100,33 @@ public class ViewPagerHomeFragment extends Fragment {
     }
 
 
+    public void scheduleSendPosition() {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                checkTimeLeft();          // this method will contain your almost-finished HTTP calls
+                handler.postDelayed(this, FIVE_SECONDS);
+            }
+        }, FIVE_SECONDS);
+    }
 
+    private void checkTimeLeft() {
+        if (simpleExoPlayer!=null){
+            float progress = simpleExoPlayer.getDuration() > 0 ? ((float) simpleExoPlayer.getCurrentPosition() / simpleExoPlayer.getDuration()) * 100 : 0f;
+            Log.d("amit","progress :  "+Math.round(progress));
+            //  mProgressBar.setProgress(Math.round(progress));
+            long totalDuration = simpleExoPlayer.getDuration() / 1000;
+            Log.d("amit","total duration :  "+totalDuration);
 
+            if ((totalDuration-Math.round(progress)) == 15){
+                Log.d("amit","Show recyclerview");
+            }
+        }
+    }
 
     private void initViews(View view) {
         playerView = view.findViewById(R.id.video_view);
     }
-
 
     private void initializePlayer() {
         try {
@@ -143,7 +143,7 @@ public class ViewPagerHomeFragment extends Fragment {
                 simpleExoPlayer.seekTo(seekPosition);
                 if (mediaSource != null)
                     simpleExoPlayer.prepare(mediaSource, false, false);
-                mHandler.post(updateUI);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -227,6 +227,5 @@ public class ViewPagerHomeFragment extends Fragment {
         }
         return null;
     }
-
 
 }
