@@ -7,6 +7,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Handler;
@@ -30,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ViewPagerHomeFragment extends Fragment {
-    private String homeVideoModelList;
+    private PlaylistData homeVideoModelList;
     private Context context;
     private int position;
     private PlayerView playerView;
@@ -40,10 +42,12 @@ public class ViewPagerHomeFragment extends Fragment {
     private int seekPosition;
     private ViewPager2 view_pager_stories;
     private long modelduration;
-    private boolean b = true;
+    private boolean b = true , p = true;
     private String duration;
     private ProgressBar progressBar;
     private final int FIVE_SECONDS = 1000;
+    private RecyclerView rvImage;
+    private  Handler handler = new Handler();
 
 
     SimpleExoPlayer.EventListener eventListener = new Player.EventListener() {
@@ -53,7 +57,7 @@ public class ViewPagerHomeFragment extends Fragment {
             if (playbackState == Player.STATE_READY && playWhenReady) {
                 modelduration = simpleExoPlayer.getDuration();
                   duration =toMMSS(modelduration);
-                progressBar.setVisibility(View.GONE);
+             //   progressBar.setVisibility(View.GONE);
 
                 if (b){
                     b = false;
@@ -61,18 +65,19 @@ public class ViewPagerHomeFragment extends Fragment {
                       scheduleSendPosition();
                      Log.d("amit","thread line down");
                 }
-                Toast.makeText(context, "duration : " + duration, Toast.LENGTH_SHORT).show();
             }
             if (playbackState == Player.STATE_ENDED && playWhenReady) {
                 Log.v("amit","ended");
                 b = true;
+                p = true;
+                handler.removeCallbacksAndMessages(null);
                 view_pager_stories.setCurrentItem(view_pager_stories.getCurrentItem()+1);
             }
 
         }
     };
 
-    public static Fragment newInstance(String homeVideoModelList, Context context, int position,
+    public static Fragment newInstance(PlaylistData homeVideoModelList, Context context, int position,
                                        ViewPager2 view_pager_stories) {
         ViewPagerHomeFragment fragment = new ViewPagerHomeFragment();
         fragment.homeVideoModelList = homeVideoModelList;
@@ -101,43 +106,61 @@ public class ViewPagerHomeFragment extends Fragment {
 
 
     public void scheduleSendPosition() {
-        Handler handler = new Handler();
+
         handler.postDelayed(new Runnable() {
             public void run() {
                 checkTimeLeft();          // this method will contain your almost-finished HTTP calls
                 handler.postDelayed(this, FIVE_SECONDS);
             }
         }, FIVE_SECONDS);
+
     }
 
     private void checkTimeLeft() {
         if (simpleExoPlayer!=null){
             float progress = simpleExoPlayer.getDuration() > 0 ? ((float) simpleExoPlayer.getCurrentPosition() / simpleExoPlayer.getDuration()) * 100 : 0f;
             Log.d("amit","progress :  "+Math.round(progress));
-            //  mProgressBar.setProgress(Math.round(progress));
             long totalDuration = simpleExoPlayer.getDuration() / 1000;
             Log.d("amit","total duration :  "+totalDuration);
+            Log.d("amit","total duration in milli :  "+Math.round(simpleExoPlayer.getDuration()));
+            Log.d("amit","progress duration in milli :  "+Math.round(simpleExoPlayer.getCurrentPosition()));
 
-            if ((totalDuration-Math.round(progress)) == 15){
-                Log.d("amit","Show recyclerview");
+            if ((Math.round(simpleExoPlayer.getDuration()) - Math.round(simpleExoPlayer.getCurrentPosition())) <= 15000){
+                if (p){
+                    p = false;
+                    Log.d("atul","Show recyclerview");
+                    setRecyclerView();
+                }
+
             }
+
+
         }
+    }
+
+    private void setRecyclerView() {
+        rvImage.setVisibility(View.VISIBLE);
+        ImageDiaplayAdapter adapter = new ImageDiaplayAdapter(getActivity(),homeVideoModelList.getImageUrl());
+        rvImage.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rvImage.hasFixedSize();
+        rvImage.setAdapter(adapter);
     }
 
     private void initViews(View view) {
         playerView = view.findViewById(R.id.video_view);
+        rvImage = view.findViewById(R.id.rvImage);
     }
 
     private void initializePlayer() {
         try {
-            progressBar = view.findViewById(R.id.progressBar);
-            progressBar.setVisibility(View.VISIBLE);
+           /* progressBar = view.findViewById(R.id.progressBar);
+            progressBar.setVisibility(View.VISIBLE);*/
             simpleExoPlayer = new SimpleExoPlayer.Builder(context).build();
             if (simpleExoPlayer != null) {
                 playerView.setPlayer(simpleExoPlayer);
                 simpleExoPlayer.addListener(eventListener);
                // simpleExoPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
-                Uri uri = Uri.parse(homeVideoModelList);
+                Uri uri = Uri.parse(homeVideoModelList.getVideoUrl());
                 MediaSource mediaSource = buildMediaSource(uri);
                 simpleExoPlayer.setPlayWhenReady(isPlayerPlay);
                 simpleExoPlayer.seekTo(seekPosition);

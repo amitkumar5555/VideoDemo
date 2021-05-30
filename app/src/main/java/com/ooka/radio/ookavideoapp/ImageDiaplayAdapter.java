@@ -10,7 +10,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.List;
 
@@ -18,6 +22,11 @@ public class ImageDiaplayAdapter extends RecyclerView.Adapter<ImageDiaplayAdapte
 
    private Context context;
    private String imgUrl;
+
+    public ImageDiaplayAdapter(FragmentActivity activity, String imageUrl) {
+        context = activity;
+        imgUrl = imageUrl;
+    }
 
     @NonNull
     @Override
@@ -28,12 +37,18 @@ public class ImageDiaplayAdapter extends RecyclerView.Adapter<ImageDiaplayAdapte
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-       holder.img.setImageResource(R.mipmap.ic_launcher);
+     //  holder.img.setImageResource(R.mipmap.ic_launcher);
+        Glide.with(context).load(imgUrl).into(holder.img);
     }
 
     @Override
     public int getItemCount() {
-        return imgUrl.length();
+        if (imgUrl!=null){
+            return imgUrl.length();
+        }else {
+            return 1;
+        }
+
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

@@ -46,19 +46,47 @@ public class HomeFragmentNew extends Fragment {
 
 
     private void getAllVideoList() {
-        List<String> video = new ArrayList<>();
+
+        progressBar.setVisibility(View.VISIBLE);
+        ApiInterface interfaceApi = ApiClient.getClient().create(ApiInterface.class);
+        Call<PlaylistResp> call = interfaceApi.getPlayList();
+        call.enqueue(new Callback<PlaylistResp>() {
+            @Override
+            public void onResponse(Call<PlaylistResp> call, Response<PlaylistResp> response) {
+
+                    if (response.isSuccessful()){
+                        if (response.body().getStatusCode() == 200){
+                            List<PlaylistData> data = response.body().getResponse().getData();
+                            if (data!=null && data.size()>0){
+                                setVideoPlayerJobAdapter(data);
+                            }
+                        }
+                    }
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Call<PlaylistResp> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+
+            }
+        });
+
+
+
+       /* List<String> video = new ArrayList<>();
         video.add("http://18.191.187.85/videos/p1.mp4");
         video.add("http://18.191.187.85/videos/p2.mp4");
         video.add("http://18.191.187.85/videos/p3.mp4");
         video.add("http://18.191.187.85/videos/p4.mp4");
-        video.add("http://18.191.187.85/videos/p5.mp4");
-        setVideoPlayerJobAdapter(video);
+        video.add("http://18.191.187.85/videos/p5.mp4");*/
+       // setVideoPlayerJobAdapter(video);
     }
 
 
 
 
-    private void setVideoPlayerJobAdapter(final List<String> videoModelLists) {
+    private void setVideoPlayerJobAdapter(final List<PlaylistData> videoModelLists) {
         view_pager_stories.setOffscreenPageLimit(10);
         myPageAdapter = new VideoPlayerJobHomeAdapter1(getActivity().getSupportFragmentManager(), getLifecycle(), videoModelLists, getActivity());
         view_pager_stories.setSaveFromParentEnabled(false);
@@ -68,10 +96,10 @@ public class HomeFragmentNew extends Fragment {
     }
 
     public class VideoPlayerJobHomeAdapter1 extends FragmentStateAdapter {
-        private final List<String> videoModelLists;
+        private final List<PlaylistData> videoModelLists;
         private final Context context;
 
-        public VideoPlayerJobHomeAdapter1(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle, List<String> videoModelLists, FragmentActivity activity) {
+        public VideoPlayerJobHomeAdapter1(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle, List<PlaylistData> videoModelLists, FragmentActivity activity) {
             super(fragmentManager, lifecycle);
             this.videoModelLists = videoModelLists;
             context = activity;
