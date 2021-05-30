@@ -4,6 +4,9 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class PlaylistData {
+    @SerializedName("title")
+    @Expose
+    private String title;
     @SerializedName("sequenceNo")
     @Expose
     private Integer sequenceNo;
@@ -13,6 +16,14 @@ public class PlaylistData {
     @SerializedName("imageUrl")
     @Expose
     private String imageUrl;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public Integer getSequenceNo() {
         return sequenceNo;

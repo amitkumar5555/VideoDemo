@@ -21,11 +21,13 @@ import java.util.List;
 public class ImageDiaplayAdapter extends RecyclerView.Adapter<ImageDiaplayAdapter.MyViewHolder> {
 
    private Context context;
-   private String imgUrl;
+   private String imgUrl,title;
 
-    public ImageDiaplayAdapter(FragmentActivity activity, String imageUrl) {
+
+    public ImageDiaplayAdapter(FragmentActivity activity, String imageUrl,String title) {
         context = activity;
         imgUrl = imageUrl;
+        this.title = title;
     }
 
     @NonNull
@@ -37,25 +39,22 @@ public class ImageDiaplayAdapter extends RecyclerView.Adapter<ImageDiaplayAdapte
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-     //  holder.img.setImageResource(R.mipmap.ic_launcher);
         Glide.with(context).load(imgUrl).into(holder.img);
+        holder.titl.setText(title);
     }
 
     @Override
     public int getItemCount() {
-        if (imgUrl!=null){
-            return imgUrl.length();
-        }else {
             return 1;
-        }
-
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         ImageView img;
+        TextView titl;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             img = itemView.findViewById(R.id.image);
+            titl = itemView.findViewById(R.id.title);
         }
     }
 }

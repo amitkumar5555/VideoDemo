@@ -54,10 +54,15 @@ public class ViewPagerHomeFragment extends Fragment {
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
 
+            if (playbackState == Player.STATE_BUFFERING || playbackState == Player.STATE_IDLE ||
+                    playbackState == Player.STATE_READY ){
+                playerView.setKeepScreenOn(true);
+            }
+
+
             if (playbackState == Player.STATE_READY && playWhenReady) {
                 modelduration = simpleExoPlayer.getDuration();
                   duration =toMMSS(modelduration);
-             //   progressBar.setVisibility(View.GONE);
 
                 if (b){
                     b = false;
@@ -125,7 +130,7 @@ public class ViewPagerHomeFragment extends Fragment {
             Log.d("amit","total duration in milli :  "+Math.round(simpleExoPlayer.getDuration()));
             Log.d("amit","progress duration in milli :  "+Math.round(simpleExoPlayer.getCurrentPosition()));
 
-            if ((Math.round(simpleExoPlayer.getDuration()) - Math.round(simpleExoPlayer.getCurrentPosition())) <= 15000){
+            if ((Math.round(simpleExoPlayer.getDuration()) - Math.round(simpleExoPlayer.getCurrentPosition())) <= 300000){
                 if (p){
                     p = false;
                     Log.d("atul","Show recyclerview");
@@ -140,7 +145,7 @@ public class ViewPagerHomeFragment extends Fragment {
 
     private void setRecyclerView() {
         rvImage.setVisibility(View.VISIBLE);
-        ImageDiaplayAdapter adapter = new ImageDiaplayAdapter(getActivity(),homeVideoModelList.getImageUrl());
+        ImageDiaplayAdapter adapter = new ImageDiaplayAdapter(getActivity(),homeVideoModelList.getImageUrl(),homeVideoModelList.getTitle());
         rvImage.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvImage.hasFixedSize();
         rvImage.setAdapter(adapter);
