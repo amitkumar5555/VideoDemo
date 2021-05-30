@@ -16,9 +16,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -44,9 +47,7 @@ public class ViewPagerHomeFragment extends Fragment {
     private long modelduration;
     private boolean b = true, p = true;
     private String duration;
-    private ProgressBar progressBar;
     private final int FIVE_SECONDS = 1000;
-    private RecyclerView rvImage;
     private Handler handler = new Handler();
 
     SimpleExoPlayer.EventListener eventListener = new Player.EventListener() {
@@ -129,43 +130,49 @@ public class ViewPagerHomeFragment extends Fragment {
             Log.d("amit", "total duration in milli :  " + Math.round(simpleExoPlayer.getDuration()));
             Log.d("amit", "progress duration in milli :  " + Math.round(simpleExoPlayer.getCurrentPosition()));
 
-            if ((Math.round(simpleExoPlayer.getDuration()) - Math.round(simpleExoPlayer.getCurrentPosition())) <= 300000) {
+            if ((Math.round(simpleExoPlayer.getDuration()) - Math.round(simpleExoPlayer.getCurrentPosition())) <= 30000) {
                 if (p) {
                     p = false;
-                    int nextSequenceNo = view_pager_stories.getCurrentItem() + 1;
+                  /*  int nextSequenceNo = view_pager_stories.getCurrentItem() + 1;
                     PlaylistData nextTrack = DataHolder.getPlaylist().get(nextSequenceNo);
                     nextTrack.getTitle();
                     nextTrack.getImageUrl();
 
                     Log.d("atul", "Show recyclerview");
-                    setLayoutDetails("title", "image");
-                    setRecyclerView();
+                    setLayoutDetails(nextTrack.getTitle(), nextTrack.getImageUrl());*/
+                    View v = view.findViewById(R.id.linear);
+                    v.setVisibility(View.VISIBLE);
+
                 }
             }
         }
     }
 
     private void setLayoutDetails(String title, String image) {
+        /*View v = view.findViewById(R.id.linear);
+        v.setVisibility(View.VISIBLE);*/
+        TextView textView = view.findViewById(R.id.title);
+        textView.setText(title);
+        ImageView imgView = view.findViewById(R.id.image);
+        Glide.with(context).load(image).into(imgView);
 
     }
 
-    private void setRecyclerView() {
-        rvImage.setVisibility(View.VISIBLE);
-        ImageDiaplayAdapter adapter = new ImageDiaplayAdapter(getActivity(), homeVideoModelList.getImageUrl(), homeVideoModelList.getTitle());
-        rvImage.setLayoutManager(new LinearLayoutManager(getActivity()));
-        rvImage.hasFixedSize();
-        rvImage.setAdapter(adapter);
-    }
+
 
     private void initViews(View view) {
         playerView = view.findViewById(R.id.video_view);
-        rvImage = view.findViewById(R.id.rvImage);
+
+        int nextSequenceNo = view_pager_stories.getCurrentItem() + 1;
+        PlaylistData nextTrack = DataHolder.getPlaylist().get(nextSequenceNo);
+
+        Log.d("atul", "Show recyclerview");
+        setLayoutDetails(nextTrack.getTitle(), nextTrack.getImageUrl());
+
     }
 
     private void initializePlayer() {
         try {
-           /* progressBar = view.findViewById(R.id.progressBar);
-            progressBar.setVisibility(View.VISIBLE);*/
             simpleExoPlayer = new SimpleExoPlayer.Builder(context).build();
             if (simpleExoPlayer != null) {
                 playerView.setPlayer(simpleExoPlayer);

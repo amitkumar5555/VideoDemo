@@ -20,13 +20,19 @@
             app:resize_mode="zoom"
             app:use_controller="false" />
 
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_launcher_black"
+                />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvImage"
-            android:visibility="gone"
-            android:layout_centerInParent="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+
+        <include
+            android:layout_alignParentBottom="true"
+            layout="@layout/item_seen_before_end"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_width="match_parent" />
 
 
         <ProgressBar
