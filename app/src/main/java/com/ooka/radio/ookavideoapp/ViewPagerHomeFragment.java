@@ -42,41 +42,40 @@ public class ViewPagerHomeFragment extends Fragment {
     private int seekPosition;
     private ViewPager2 view_pager_stories;
     private long modelduration;
-    private boolean b = true , p = true;
+    private boolean b = true, p = true;
     private String duration;
     private ProgressBar progressBar;
     private final int FIVE_SECONDS = 1000;
     private RecyclerView rvImage;
-    private  Handler handler = new Handler();
-
+    private Handler handler = new Handler();
 
     SimpleExoPlayer.EventListener eventListener = new Player.EventListener() {
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
 
             if (playbackState == Player.STATE_BUFFERING || playbackState == Player.STATE_IDLE ||
-                    playbackState == Player.STATE_READY ){
+                    playbackState == Player.STATE_READY) {
                 playerView.setKeepScreenOn(true);
             }
 
 
             if (playbackState == Player.STATE_READY && playWhenReady) {
                 modelduration = simpleExoPlayer.getDuration();
-                  duration =toMMSS(modelduration);
+                duration = toMMSS(modelduration);
 
-                if (b){
+                if (b) {
                     b = false;
-                     Log.d("amit","thread line up");
-                      scheduleSendPosition();
-                     Log.d("amit","thread line down");
+                    Log.d("amit", "thread line up");
+                    scheduleSendPosition();
+                    Log.d("amit", "thread line down");
                 }
             }
             if (playbackState == Player.STATE_ENDED && playWhenReady) {
-                Log.v("amit","ended");
+                Log.v("amit", "ended");
                 b = true;
                 p = true;
                 handler.removeCallbacksAndMessages(null);
-                view_pager_stories.setCurrentItem(view_pager_stories.getCurrentItem()+1);
+                view_pager_stories.setCurrentItem(view_pager_stories.getCurrentItem() + 1);
             }
 
         }
@@ -122,30 +121,37 @@ public class ViewPagerHomeFragment extends Fragment {
     }
 
     private void checkTimeLeft() {
-        if (simpleExoPlayer!=null){
+        if (simpleExoPlayer != null) {
             float progress = simpleExoPlayer.getDuration() > 0 ? ((float) simpleExoPlayer.getCurrentPosition() / simpleExoPlayer.getDuration()) * 100 : 0f;
-            Log.d("amit","progress :  "+Math.round(progress));
+            Log.d("amit", "progress :  " + Math.round(progress));
             long totalDuration = simpleExoPlayer.getDuration() / 1000;
-            Log.d("amit","total duration :  "+totalDuration);
-            Log.d("amit","total duration in milli :  "+Math.round(simpleExoPlayer.getDuration()));
-            Log.d("amit","progress duration in milli :  "+Math.round(simpleExoPlayer.getCurrentPosition()));
+            Log.d("amit", "total duration :  " + totalDuration);
+            Log.d("amit", "total duration in milli :  " + Math.round(simpleExoPlayer.getDuration()));
+            Log.d("amit", "progress duration in milli :  " + Math.round(simpleExoPlayer.getCurrentPosition()));
 
-            if ((Math.round(simpleExoPlayer.getDuration()) - Math.round(simpleExoPlayer.getCurrentPosition())) <= 300000){
-                if (p){
+            if ((Math.round(simpleExoPlayer.getDuration()) - Math.round(simpleExoPlayer.getCurrentPosition())) <= 300000) {
+                if (p) {
                     p = false;
-                    Log.d("atul","Show recyclerview");
+                    int nextSequenceNo = view_pager_stories.getCurrentItem() + 1;
+                    PlaylistData nextTrack = DataHolder.getPlaylist().get(nextSequenceNo);
+                    nextTrack.getTitle();
+                    nextTrack.getImageUrl();
+
+                    Log.d("atul", "Show recyclerview");
+                    setLayoutDetails("title", "image");
                     setRecyclerView();
                 }
-
             }
-
-
         }
+    }
+
+    private void setLayoutDetails(String title, String image) {
+
     }
 
     private void setRecyclerView() {
         rvImage.setVisibility(View.VISIBLE);
-        ImageDiaplayAdapter adapter = new ImageDiaplayAdapter(getActivity(),homeVideoModelList.getImageUrl(),homeVideoModelList.getTitle());
+        ImageDiaplayAdapter adapter = new ImageDiaplayAdapter(getActivity(), homeVideoModelList.getImageUrl(), homeVideoModelList.getTitle());
         rvImage.setLayoutManager(new LinearLayoutManager(getActivity()));
         rvImage.hasFixedSize();
         rvImage.setAdapter(adapter);
@@ -164,7 +170,7 @@ public class ViewPagerHomeFragment extends Fragment {
             if (simpleExoPlayer != null) {
                 playerView.setPlayer(simpleExoPlayer);
                 simpleExoPlayer.addListener(eventListener);
-               // simpleExoPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
+                // simpleExoPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
                 Uri uri = Uri.parse(homeVideoModelList.getVideoUrl());
                 MediaSource mediaSource = buildMediaSource(uri);
                 simpleExoPlayer.setPlayWhenReady(isPlayerPlay);

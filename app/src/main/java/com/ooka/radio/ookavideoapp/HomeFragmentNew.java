@@ -29,6 +29,7 @@ public class HomeFragmentNew extends Fragment {
     private ProgressBar progressBar;
     View view;
     private VideoPlayerJobHomeAdapter1 myPageAdapter;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -54,14 +55,15 @@ public class HomeFragmentNew extends Fragment {
             @Override
             public void onResponse(Call<PlaylistResp> call, Response<PlaylistResp> response) {
 
-                    if (response.isSuccessful()){
-                        if (response.body().getStatusCode() == 200){
-                            List<PlaylistData> data = response.body().getResponse().getData();
-                            if (data!=null && data.size()>0){
-                                setVideoPlayerJobAdapter(data);
-                            }
+                if (response.isSuccessful()) {
+                    if (response.body().getStatusCode() == 200) {
+                        List<PlaylistData> data = response.body().getResponse().getData();
+                        DataHolder.setPlaylist(data);
+                        if (data != null && data.size() > 0) {
+                            setVideoPlayerJobAdapter(data);
                         }
                     }
+                }
                 progressBar.setVisibility(View.GONE);
             }
 
@@ -80,10 +82,8 @@ public class HomeFragmentNew extends Fragment {
         video.add("http://18.191.187.85/videos/p3.mp4");
         video.add("http://18.191.187.85/videos/p4.mp4");
         video.add("http://18.191.187.85/videos/p5.mp4");*/
-       // setVideoPlayerJobAdapter(video);
+        // setVideoPlayerJobAdapter(video);
     }
-
-
 
 
     private void setVideoPlayerJobAdapter(final List<PlaylistData> videoModelLists) {
@@ -105,10 +105,14 @@ public class HomeFragmentNew extends Fragment {
             context = activity;
         }
 
+        public PlaylistData getItemForSequenceNo(int sequenceNo) {
+            return videoModelLists.get(sequenceNo);
+        }
+
         @NonNull
         @Override
         public Fragment createFragment(int position) {
-            return ViewPagerHomeFragment.newInstance(videoModelLists.get(position), context, position,view_pager_stories);
+            return ViewPagerHomeFragment.newInstance(videoModelLists.get(position), context, position, view_pager_stories);
         }
 
         @Override
